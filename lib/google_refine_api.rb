@@ -79,7 +79,7 @@ class Refine
       :"processQuotes" => false,
       :"storeBlankCellsAsNulls" => true,
       :"includeFileSources" => false,
-      :"projectName" => "fromAPI" 
+      :"projectName" => "Uploaded by gem google_refine_api" 
     }
 
     format = param[:format]
