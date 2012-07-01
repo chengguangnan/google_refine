@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.files       = ['lib/google_refine.rb']
 
   s.add_dependency 'rest-client'
+  s.add_dependency 'trollop'
 
-  s.executables = Pathname.glob('bin/*').map(&:basename)
+  s.executables = Pathname.glob('bin/*').map { |p| p.basename.to_s }
 end
