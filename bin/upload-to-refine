@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../lib/google_refine', __FILE__)
+
+require 'trollop'
+require 'tempfile'
+
+opts = Trollop::options do
+  opt :host, "Address of Google Refine", :default => '0.0.0.0:3333'
+end
+
+
+Signal.trap("INT") { puts "Terminating: #{$$}" }
+
+host = opts[:host]
+
+file = nil
+
+if ARGV.size > 0 
+  file = ARGV.shift
+  abort "File \"#{file}\" does not exists." if not File.exists?(file)
+end
+
+tempfile = nil
+
+if file.nil?
+  if STDIN.tty?
+    abort "The STDIN should not be a TTY."
+  else
+    tempfile = Tempfile.new('upload-to-pipelines')
+    tempfile.close
+    
+    IO.copy_stream(STDIN, tempfile)
+    file = tempfile.path
+  end
+end
+
+
+refine = Refine.new(host)
+
+puts refine.create_project(file, :projectName => file)
+
+tempfile.unlink if not tempfile.nil?

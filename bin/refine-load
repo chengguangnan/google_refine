@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-require File.expand_path('../../lib/google_refine_api', __FILE__)
-
-host = ARGV[1]
-file = ARGV[0]
-
-refine = Refine.new(host)
-puts refine.create_project(file, :projectName => file)
-
