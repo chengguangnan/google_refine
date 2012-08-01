@@ -58,6 +58,7 @@ class Job
 end
 
 class Refine
+
   attr_accessor :url
 
   def initialize(url)
@@ -77,6 +78,11 @@ class Refine
     Job.new(self, job_id)
   end
 
+  def version
+    response = RestClient.get("#{self.url}/command/core/get-version")
+    JSON[response]['version']
+  end
+
   def create_project(filename, param = {})
 
     options = {}
@@ -93,13 +99,25 @@ class Refine
     options[:processQuotes]          = param[:processQuotes]             || false
     options[:storeBlankCellsAsNulls] = param[:storeBlankCellsAsNulls]    || true
     options[:includeFileSources]     = param[:includeFileSources]        || false
-    
-    job = create_importing_job
-    job.load_raw_data(filename)
-    project = job.create_project(options)
-    project
-    ensure
-      job.cancel if job
+
+    if self.version >= "2.5"
+      begin
+        job = create_importing_job
+        job.load_raw_data(filename)
+        project = job.create_project(options)
+        project
+      ensure
+        job.cancel if job
+      end
+    elsif self.version == "2.0"
+      begin
+        RestClient.post("#{self.url}/command/core/create-project-from-upload", :'project-name' => options[:projectName], :'project-file' => File.new(filename, "rb"))
+      rescue RestClient::Found
+        project_id = $!.response.headers[:location].match(/project=(\d+)/)[1]
+        Project.new(self, project_id)
+      end
+    end
+
   end
 
 end
