@@ -87,8 +87,8 @@ class Refine
 
     options = {}
     options[:format]                 = param[:format]
-    options[:projectName]            = param[:name]                      || "File \"#{filename}\" uploaded on #{Time.now}"
-    options[:encoding]               = param[:encoding]                  || ""
+    options[:projectName]            = param[:name]                      || "File \"#{filename}\""
+    options[:encoding]               = param[:encoding]                  || "UTF-8"
     options[:separator]              = param[:separator]                 || "\\t"
     options[:ignoreLines]            = param[:ignoreLines]               || -1
     options[:headerLines]            = param[:headerLines]               || 0
@@ -111,7 +111,12 @@ class Refine
       end
     elsif self.version == "2.0"
       begin
-        RestClient.post("#{self.url}/command/core/create-project-from-upload", :'project-name' => options[:projectName], :'project-file' => File.new(filename, "rb"))
+        RestClient.post("#{self.url}/command/core/create-project-from-upload",
+          :'project-name'      => options[:name],
+          :'guess-value-type'  => options[:guessCellValueTypes],
+          :'header-lines'      => options[:headerLines],
+          :'limit'             => options[:limit],
+          :'project-file'      => File.new(filename, "rb"))
       rescue RestClient::Found
         project_id = $!.response.headers[:location].match(/project=(\d+)/)[1]
         Project.new(self, project_id)

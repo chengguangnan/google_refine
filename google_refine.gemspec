@@ -2,8 +2,8 @@ require 'pathname'
 
 Gem::Specification.new do |s|
   s.name        = 'google_refine'
-  s.version     = '0.1'
-  s.summary     = 'Upload files to refine using command line or programmtically.'
+  s.version     = '0.2.' + Time.now.to_i.to_s
+  s.summary     = 'Upload to Google Refine.'
   s.authors     = 'Cheng Guang-Nan'
   s.email       = 'guangnan@chengguangnan.com'
   s.homepage    = 'https://github.com/guangnan/google_refine'
