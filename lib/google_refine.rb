@@ -112,7 +112,7 @@ class Refine
     elsif self.version == "2.0"
       begin
         RestClient.post("#{self.url}/command/core/create-project-from-upload",
-          :'project-name'      => options[:name],
+          :'project-name'      => options[:projectName],
           :'guess-value-type'  => options[:guessCellValueTypes],
           :'header-lines'      => options[:headerLines],
           :'limit'             => options[:limit],
