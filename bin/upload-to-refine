@@ -7,6 +7,10 @@ require 'tempfile'
 
 opts = Trollop::options do
   opt :host, "Address of Google Refine", :default => '0.0.0.0:3333'
+  opt :project_name, 'Project name'
+  opt :header_lines, 'Header lines', :default => 0
+  opt :process_qoutes
+  opt :limit, 'limit', :default => 0
 end
 
 
@@ -38,6 +42,6 @@ end
 
 refine = Refine.new(host)
 
-puts refine.create_project(file, :projectName => file)
+puts refine.create_project(file, opts)
 
 tempfile.unlink if not tempfile.nil?

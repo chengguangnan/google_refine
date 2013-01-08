@@ -83,25 +83,23 @@ class Refine
     JSON[response]['version']
   end
 
+
   def create_project(filename, param = {})
 
-    options = {}
-    options[:format]                 = param[:format]
-    options[:projectName]            = param[:name]                      || "File \"#{filename}\""
-    options[:encoding]               = param[:encoding]                  || "UTF-8"
-    options[:separator]              = param[:separator]                 || "\\t"
-    options[:ignoreLines]            = param[:ignoreLines]               || -1
-    options[:headerLines]            = param[:headerLines]               || 0
-    options[:skipDataLines]          = param[:skipDataLines]             || 0
-    options[:limit]                  = param[:limit]                     || 1_000_000
-    options[:storeBlankRows]         = param[:storeBlankRows]            || true
-    options[:guessCellValueTypes]    = param[:guessCellValueTypes]       || true
-    options[:processQuotes]          = param[:processQuotes]             || false
-    options[:storeBlankCellsAsNulls] = param[:storeBlankCellsAsNulls]    || true
-    options[:includeFileSources]     = param[:includeFileSources]        || false
+
+    param[:project_name] ||= File.basename(filename)
 
     if self.version >= "2.5"
       begin
+        options = {}
+        options[:projectName]            = param[:project_name]              
+        options[:encoding]               = param[:encoding]                  || "UTF-8"
+        options[:separator]              = param[:separator]                 || "\\t"
+        options[:headerLines]            = param[:header_lines]              || 0
+        options[:limit]                  = param[:limit]                     
+        options[:guessCellValueTypes]    = param[:guess_value_type]          || false
+        options[:processQuotes]          = param[:process_quotes]            || false
+
         job = create_importing_job
         job.load_raw_data(filename)
         project = job.create_project(options)
@@ -109,14 +107,19 @@ class Refine
       ensure
         job.cancel if job
       end
-    elsif self.version == "2.0"
+    elsif [ "2.0", "2.1" ].include?(self.version)
       begin
         RestClient.post("#{self.url}/command/core/create-project-from-upload",
-          :'project-name'      => options[:projectName],
-          :'guess-value-type'  => options[:guessCellValueTypes],
-          :'header-lines'      => options[:headerLines],
-          :'limit'             => options[:limit],
-          :'project-file'      => File.new(filename, "rb"))
+          Hash[
+           {  project_name:      param[:project_name],
+              header_lines:      param[:header_lines],
+              limit:             param[:limit],
+              guess_value_type:  param[:guess_value_type],
+              ignore_quotes:     ! param[:process_quotes],
+              project_file:  File.new(filename, "rb")
+            }.map { |key, value| [ key.to_s.gsub('_', '-'), value ] } 
+          ]
+        )
       rescue RestClient::Found
         project_id = $!.response.headers[:location].match(/project=(\d+)/)[1]
         Project.new(self, project_id)
