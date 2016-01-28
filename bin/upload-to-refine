@@ -9,12 +9,14 @@ opts = Trollop::options do
   opt :host, "Address of Google Refine", :default => '0.0.0.0:3333'
   opt :project_name, 'Project name'
   opt :header_lines, 'Header lines', :default => 1
-  opt :process_qoutes
   opt :limit, 'limit', :default => 0
 end
 
 
-Signal.trap("INT") { puts "Terminating: #{$$}" }
+Signal.trap("INT") {
+  puts "Terminating: #{$$}"
+  exit
+}
 
 host = opts[:host]
 

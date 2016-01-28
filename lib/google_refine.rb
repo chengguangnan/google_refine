@@ -97,9 +97,7 @@ class Refine
         options[:headerLines]            = param[:header_lines]              || 1
         options[:limit]                  = param[:limit]
         options[:guessCellValueTypes]    = param[:guess_value_type]          || false
-        options[:processQuotes]          = param[:process_quotes]            || false
-
-        warn options
+        options[:processQuotes]          = true
 
         job = create_importing_job
         job.load_raw_data(filename)
