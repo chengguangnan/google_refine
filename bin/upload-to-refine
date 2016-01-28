@@ -8,7 +8,7 @@ require 'tempfile'
 opts = Trollop::options do
   opt :host, "Address of Google Refine", :default => '0.0.0.0:3333'
   opt :project_name, 'Project name'
-  opt :header_lines, 'Header lines', :default => 0
+  opt :header_lines, 'Header lines', :default => 1
   opt :process_qoutes
   opt :limit, 'limit', :default => 0
 end
@@ -20,7 +20,7 @@ host = opts[:host]
 
 file = nil
 
-if ARGV.size > 0 
+if ARGV.size > 0
   file = ARGV.shift
   abort "File \"#{file}\" does not exists." if not File.exists?(file)
 end
@@ -31,9 +31,9 @@ if file.nil?
   if STDIN.tty?
     abort "The STDIN should not be a TTY."
   else
-    tempfile = Tempfile.new('upload-to-pipelines')
+    tempfile = Tempfile.new('upload-to-refine')
     tempfile.close
-    
+
     IO.copy_stream(STDIN, tempfile)
     file = tempfile.path
   end
@@ -41,6 +41,11 @@ end
 
 
 refine = Refine.new(host)
+
+File.open(file) do |f|
+  line = f.readline
+  opts[:separator] = line.count(",") > line.count("\t") ? "," : "\t"
+end
 
 puts refine.create_project(file, opts)
 

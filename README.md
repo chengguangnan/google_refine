@@ -1,4 +1,12 @@
-# Command Line Usage
+## Install
+
+Note that it's 'google_refine', underscore.
+
+```
+gem install google_refine
+```
+
+## Command Line Usage
 
 ```
 upload-to-refine [FILE]
@@ -12,6 +20,3 @@ upload-to-refine [FILE] --header-lines 1
 upload-to-refine [FILE] --limit 1000
 
 ```
-
-
-

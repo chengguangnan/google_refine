@@ -3,7 +3,7 @@ require 'json'
 
 class Project
 
-  attr_accessor :id  
+  attr_accessor :id
   attr_accessor :refine
 
   def initialize(refine, id)
@@ -18,9 +18,9 @@ end
 
 class Job
 
-  attr_accessor :id  
+  attr_accessor :id
   attr_accessor :refine
-  
+
   def initialize(refine, id)
     self.refine = refine
     self.id = id
@@ -64,7 +64,7 @@ class Refine
   def initialize(url)
     self.url = url
   end
-  
+
   def url=(url)
     if url !~ /^http/
       url = "http://#{url}"
@@ -86,19 +86,20 @@ class Refine
 
   def create_project(filename, param = {})
 
-
     param[:project_name] ||= File.basename(filename)
 
     if self.version >= "2.5"
       begin
         options = {}
-        options[:projectName]            = param[:project_name]              
+        options[:projectName]            = param[:project_name]
         options[:encoding]               = param[:encoding]                  || "UTF-8"
-        options[:separator]              = param[:separator]                 || "\\t"
-        options[:headerLines]            = param[:header_lines]              || 0
-        options[:limit]                  = param[:limit]                     
+        options[:separator]              = param[:separator]                 || "\t"
+        options[:headerLines]            = param[:header_lines]              || 1
+        options[:limit]                  = param[:limit]
         options[:guessCellValueTypes]    = param[:guess_value_type]          || false
         options[:processQuotes]          = param[:process_quotes]            || false
+
+        warn options
 
         job = create_importing_job
         job.load_raw_data(filename)
@@ -117,7 +118,7 @@ class Refine
               guess_value_type:  param[:guess_value_type],
               ignore_quotes:     ! param[:process_quotes],
               project_file:  File.new(filename, "rb")
-            }.map { |key, value| [ key.to_s.gsub('_', '-'), value ] } 
+            }.map { |key, value| [ key.to_s.gsub('_', '-'), value ] }
           ]
         )
       rescue RestClient::Found
